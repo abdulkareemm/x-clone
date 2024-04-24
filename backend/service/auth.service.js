@@ -1,7 +1,7 @@
 import createHttpError from "http-errors";
-import  User  from "../models/User.js";
+import User from "../models/User.js";
 import validator from "validator";
-// import bcrypt from "bcryptjs";
+import bcrypt from "bcryptjs";
 
 export const createUser = async (userData) => {
   const { username, fullName, password, email } = userData;
@@ -39,7 +39,7 @@ export const createUser = async (userData) => {
       max: 128,
     })
   ) {
-    throw createHttpError(
+    throw createHttpError.BadRequest(
       "Please make sure your password is between 8 and 128 characters"
     );
   }
@@ -49,6 +49,38 @@ export const createUser = async (userData) => {
     email,
     password,
   }).save();
+
+  return user;
+};
+
+export const loginUser = async (userData) => {
+  const { email, password } = userData;
+  //  check email is valid
+  if (!validator.isEmail(email)) {
+    throw createHttpError.BadRequest(
+      "Please make sure to provide a valid email."
+    );
+  }
+  const user = await User.findOne({ email: email.toLowerCase() });
+  //  check password length
+  if (
+    !validator.isLength(password, {
+      min: 8,
+      max: 128,
+    })
+  ) {
+    throw createHttpError.BadRequest(
+      "Please make sure your password is between 8 and 128 characters"
+    );
+  }
+  //  check if acount not exist
+  if (!user) {
+    throw createHttpError.NotFound("Invalid credentials.");
+  }
+
+  //    compare password
+  let passwordMatches = await bcrypt.compare(password, user.password);
+  if (!passwordMatches) throw createHttpError.NotFound("Invalid credentials.");
 
   return user;
 };
