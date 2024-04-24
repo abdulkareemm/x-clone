@@ -1,6 +1,6 @@
 import createHttpError from "http-errors";
 import jwt from "jsonwebtoken";
-import User from "../models/User.js";
+import { findUserById } from "../service/user.service.js";
 
 export const isAuth = async(req,res,next)=>{
     try {
@@ -18,7 +18,7 @@ export const isAuth = async(req,res,next)=>{
           );
         }
 
-        const user = await User.findById(decoded.userId).select("-password");
+        const user = await findUserById(decoded.userId,"-password")
 
         if (!user) {
           return next(

@@ -2,6 +2,7 @@ import createHttpError from "http-errors";
 import User from "../models/User.js";
 import validator from "validator";
 import bcrypt from "bcryptjs";
+import { findUserByAttribute } from "./user.service.js";
 
 export const createUser = async (userData) => {
   const { username, fullName, password, email } = userData;
@@ -28,7 +29,7 @@ export const createUser = async (userData) => {
     );
   }
   //  check user is exist
-  const checkDb = await User.findOne({ email });
+  const checkDb = await findUserByAttribute({ email:email });
   if (checkDb) {
     throw createHttpError.Conflict("Please try again with a different email.");
   }
@@ -61,7 +62,10 @@ export const loginUser = async (userData) => {
       "Please make sure to provide a valid email."
     );
   }
-  const user = await User.findOne({ email: email.toLowerCase() });
+  const user = await findUserByAttribute({ email: email.toLowerCase() });
+  if(!user){
+    throw createHttpError.BadRequest("User not found")
+  }
   //  check password length
   if (
     !validator.isLength(password, {
