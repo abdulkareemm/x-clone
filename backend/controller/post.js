@@ -1,5 +1,5 @@
 import createHttpError from "http-errors";
-import { savePost } from "../service/post.service.js";
+import { removePost, savePost } from "../service/post.service.js";
 
 export const createPost = async (req, res, next) => {
   try {
@@ -19,6 +19,16 @@ export const createPost = async (req, res, next) => {
       msg: "Post saved successfully",
       post: newPost,
     });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const deletePost = async (req, res, next) => {
+  try {
+    await removePost(req.params.id, req.user._id);
+
+    res.json({ msg: "Post deleted successfully" });
   } catch (error) {
     next(error);
   }

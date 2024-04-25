@@ -1,10 +1,11 @@
 import express from "express";
 import { isAuth } from "../middlewares/auth.js";
-import { createPost } from "../controller/post.js";
+import { createPost, deletePost } from "../controller/post.js";
 const router = express.Router();
 
 
 router.post("/create",isAuth,createPost)
+router.delete("/:id",isAuth,deletePost)
 
 
 
