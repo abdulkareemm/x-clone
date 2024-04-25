@@ -3,6 +3,7 @@ import {
   removePost,
   saveCommentOnPost,
   savePost,
+  updateLikes,
 } from "../service/post.service.js";
 
 export const createPost = async (req, res, next) => {
@@ -50,3 +51,11 @@ export const commentOnPost = async (req, res, next) => {
     next(error);
   }
 };
+export const likeUnlikePost = async(req,res,next)=>{
+    try {
+        const Likes = await updateLikes(req.params.id,req.user._id); 
+        res.json(Likes)
+    } catch (error) {
+        next(error)
+    }
+}
