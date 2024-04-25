@@ -2,6 +2,7 @@ import createHttpError from "http-errors";
 import {
     allLikedPost,
     allPosts,
+  getUserPostByUsername,
   removePost,
   saveCommentOnPost,
   savePost,
@@ -73,6 +74,23 @@ export const getLikedPosts = async (req, res, next)=>{
     try {
         const likedPosts = await allLikedPost(req.user)
         res.json(likedPosts)
+    } catch (error) {
+        next(error)
+    }
+}
+export const getFollowingPosts  = async (req, res, next)=>{
+    try {
+        const followingPosts = await allFollowingPost(req.user)
+        res.json(followingPosts)
+        
+    } catch (error) {
+        next(error)
+    }
+}
+export const getUserPosts  = async (req, res, next)=>{
+    try {
+        const posts = await getUserPostByUsername(req.params.username)
+        res.json(posts)
     } catch (error) {
         next(error)
     }

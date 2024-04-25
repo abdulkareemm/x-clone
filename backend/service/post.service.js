@@ -93,7 +93,6 @@ export const allPosts = async ()=>{
     return posts
 }
 export const allLikedPost = async(user)=>{
-    console.log(user.likedPosts)
     const likedPosts = await Post.find({ _id: { $in: user.likedPosts } })
       .populate({
         path: "user",
@@ -105,4 +104,36 @@ export const allLikedPost = async(user)=>{
       });
 
     return likedPosts
+}
+export const FollowingPosts = async(user)=>{
+    const following = user.following;
+
+    const feedPosts = await Post.find({ user: { $in: following } })
+      .sort({ createdAt: -1 })
+      .populate({
+        path: "user",
+        select: "-password",
+      })
+      .populate({
+        path: "comments.user",
+        select: "-password",
+      });
+
+    return feedPosts
+}
+export const getUserPostByUsername = async(username) =>{
+    const user = await User.findOne({ username });
+    if (!user) throw createHttpError("User not found")
+    const posts = await Post.find({ user: user._id })
+      .sort({ createdAt: -1 })
+      .populate({
+        path: "user",
+        select: "-password",
+      })
+      .populate({
+        path: "comments.user",
+        select: "-password",
+      });
+
+    return posts
 }
