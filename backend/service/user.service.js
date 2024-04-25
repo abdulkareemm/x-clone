@@ -6,7 +6,7 @@ export const findUserById = async (id, selected = "") => {
   return user;
 };
 export const findUserByAttribute = async (attribute, selected = "") => {
-  const user = await User.findOne( attribute ).select(selected);
+  const user = await User.findOne(attribute).select(selected);
   return user;
 };
 export const findProfileUserByUserName = async (username) => {
@@ -16,4 +16,27 @@ export const findProfileUserByUserName = async (username) => {
     throw createHttpError.NotFound("User not found.");
   }
   return user;
+};
+
+export const followUnFollow = async (user1, user2) => {
+ 
+  const isFollowing = user1.following.includes(user2._id.toString());
+  if (isFollowing) {
+    await User.findByIdAndUpdate(user1._id, {
+      $pull: { followers: user2._id },
+    });
+    await User.findByIdAndUpdate(user2._id, {
+      $pull: { following: user1._id },
+    });
+    return {msg:"User un followed successfully"}
+  } else {
+    await User.findByIdAndUpdate(user1._id, {
+      $push: { following: user2._id },
+    });
+    await User.findByIdAndUpdate(user2._id, {
+      $push: { followers: user1._id },
+    });
+    return { msg: "User followed successfully" };
+
+  }
 };
