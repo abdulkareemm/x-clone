@@ -74,3 +74,35 @@ export const updateLikes = async (postId, userId) => {
     return Likes;
   }
 };
+export const allPosts = async ()=>{
+    const posts = await Post.find()
+      .sort({ createdAt: -1 })
+      .populate({
+        path: "user",
+        select: "-password",
+      })
+      .populate({
+        path: "comments.user",
+        select: "-password",
+      });
+
+    if (posts.length === 0) {
+      return []
+    }
+
+    return posts
+}
+export const allLikedPost = async(user)=>{
+    console.log(user.likedPosts)
+    const likedPosts = await Post.find({ _id: { $in: user.likedPosts } })
+      .populate({
+        path: "user",
+        select: "-password",
+      })
+      .populate({
+        path: "comments.user",
+        select: "-password",
+      });
+
+    return likedPosts
+}
