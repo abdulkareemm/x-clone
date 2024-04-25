@@ -1,34 +1,47 @@
+import createHttpError from "http-errors";
+import Post from "../models/Post.js";
+import { v2 as cloudinary } from "cloudinary";
 
-import createHttpError from "http-errors"
-import Post from "../models/Post.js"
-import { v2 as cloudinary}from "cloudinary"
-
-export const savePost = async (text,img,id)=>{
-const newPost = new Post({
-    user:id,
+export const savePost = async (text, img, id) => {
+  const newPost = new Post({
+    user: id,
     text,
-    img
-})
-await newPost.save()
-return newPost
-}
+    img,
+  });
+  await newPost.save();
+  return newPost;
+};
 
-export const removePost = async (id,userId)=>{
-    const post = await Post.findById(id);
-    if (!post) {
-        throw createHttpError.NotFound("Post not found")
-    }
+export const removePost = async (id, userId) => {
+  const post = await Post.findById(id);
+  if (!post) {
+    throw createHttpError.NotFound("Post not found");
+  }
 
-    if (post.user.toString() !== userId.toString()) {
-      throw createHttpError
-        .Unauthorized("You are not authorized to delete this post")
-    }
+  if (post.user.toString() !== userId.toString()) {
+    throw createHttpError.Unauthorized(
+      "You are not authorized to delete this post"
+    );
+  }
 
-    if (post.img) {
-      const imgId = post.img.split("/").pop().split(".")[0];
-      await cloudinary.uploader.destroy(imgId);
-    }
+  if (post.img) {
+    const imgId = post.img.split("/").pop().split(".")[0];
+    await cloudinary.uploader.destroy(imgId);
+  }
 
-    await Post.findByIdAndDelete(id);
-    return true
-}
+  await Post.findByIdAndDelete(id);
+  return true;
+};
+
+export const saveCommentOnPost = async (text, postId, userId) => {
+  const post = await Post.findById(postId);
+
+  if (!post) {
+    throw createHttpError.NotFound("Post not found");
+  }
+  const comment = { user: userId, text };
+
+  post.comments.push(comment);
+  await post.save();
+  return post
+};

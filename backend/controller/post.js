@@ -1,5 +1,9 @@
 import createHttpError from "http-errors";
-import { removePost, savePost } from "../service/post.service.js";
+import {
+  removePost,
+  saveCommentOnPost,
+  savePost,
+} from "../service/post.service.js";
 
 export const createPost = async (req, res, next) => {
   try {
@@ -29,6 +33,19 @@ export const deletePost = async (req, res, next) => {
     await removePost(req.params.id, req.user._id);
 
     res.json({ msg: "Post deleted successfully" });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const commentOnPost = async (req, res, next) => {
+  try {
+    const { text } = req.body;
+    if (!text) {
+      throw createHttpError.BadRequest("Text field is required");
+    }
+    const post = await saveCommentOnPost(text, req.params.id, req.user._id);
+    res.json(post);
   } catch (error) {
     next(error);
   }
