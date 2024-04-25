@@ -5,6 +5,7 @@ import {
   findUserById,
   followUnFollow,
   getUsersWithoutMe,
+  updateUserService,
 } from "../service/user.service.js";
 
 export const getUserProfile = async (req, res, next) => {
@@ -59,3 +60,27 @@ export const getSuggestedUsers = async (req, res, next) => {
     next(error)
   }
 };
+
+export const updateUser = async (req, res,next) => {
+    try {
+        const user = await updateUserService(req.body,req.user)
+         res.json({
+           msg: "update success",
+           user: {
+             _id: user._id,
+             fullName: user.fullName,
+             username: user.username,
+             email: user.email,
+             followers: user.followers,
+             following: user.following,
+             profileImg: user.profileImg,
+             coverImg: user.coverImg,
+             bio: user.bio,
+             link: user.link,
+             likedPosts:user.likedPosts,
+           },
+         });
+    } catch (error) {
+        next(error)
+    }
+}

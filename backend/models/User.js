@@ -44,7 +44,7 @@ const userSchema = new mongoose.Schema(
     coverImg: {
       type: String,
       default:
-        "https://qph.cf2.quoracdn.net/main-qimg-6d72b77c81c9841bd98fc806d702e859-lq",
+        "",
     },
     bio: {
       type: String,
