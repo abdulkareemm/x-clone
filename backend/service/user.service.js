@@ -19,7 +19,6 @@ export const findProfileUserByUserName = async (username) => {
 };
 
 export const followUnFollow = async (user1, user2) => {
- 
   const isFollowing = user1.following.includes(user2._id.toString());
   if (isFollowing) {
     await User.findByIdAndUpdate(user1._id, {
@@ -28,7 +27,7 @@ export const followUnFollow = async (user1, user2) => {
     await User.findByIdAndUpdate(user2._id, {
       $pull: { following: user1._id },
     });
-    return {msg:"User un followed successfully"}
+    return { msg: "User un followed successfully" };
   } else {
     await User.findByIdAndUpdate(user1._id, {
       $push: { following: user2._id },
@@ -37,6 +36,17 @@ export const followUnFollow = async (user1, user2) => {
       $push: { followers: user1._id },
     });
     return { msg: "User followed successfully" };
-
   }
+};
+
+export const getUsersWithoutMe = async (id, size) => {
+  const users = await User.aggregate([
+    {
+      $match: {
+        _id: { $ne: id },
+      },
+    },
+    { $sample: { size: size } },
+  ]);
+  return users
 };

@@ -4,6 +4,7 @@ import {
   findUserByAttribute,
   findUserById,
   followUnFollow,
+  getUsersWithoutMe,
 } from "../service/user.service.js";
 
 export const getUserProfile = async (req, res, next) => {
@@ -33,9 +34,28 @@ export const followUnFollowUser = async (req, res, next) => {
         createHttpError.BadRequest("You can't follow/un follow yourself")
       );
     }
-    const msg= await followUnFollow(currentUser, userToModify)
-    res.json(msg)
+    const msg = await followUnFollow(currentUser, userToModify);
+    res.json(msg);
   } catch (error) {
     next(error);
+  }
+};
+
+export const getSuggestedUsers = async (req, res, next) => {
+  try {
+    const usersFollowedByMe = await findUserById(req.user._id, "following -_id");
+      const users = await getUsersWithoutMe(req.user._id,10)
+
+      // 1,2,3,4,5,6,
+      const filteredUsers = users.filter(
+        (user) => !usersFollowedByMe.following.includes(user._id)
+      );
+      const suggestedUsers = filteredUsers.slice(0, 4);
+
+      suggestedUsers.forEach((user) => (user.password = null));
+
+      res.json(suggestedUsers);
+  } catch (error) {
+    next(error)
   }
 };
